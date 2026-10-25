@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Ulangan Online PJOK SD</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .sport-bg-pattern {
+            background-color: #0f172a;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .sport-card-glow {
+            box-shadow: 0 10px 30px -10px rgba(79, 70, 229, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col sport-bg-pattern">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-amber-500 to-emerald-400 text-slate-950 p-2.5 rounded-xl font-black text-xl shadow-lg shadow-amber-500/20 transform -rotate-3">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-wide uppercase bg-gradient-to-r from-amber-400 via-emerald-400 to-cyan-400 bg-clip-text text-transparent">PJOK CHAMPIONSHIP</h1>
+                    <p class="text-xs text-slate-400 font-medium">Ulangan Online PJOK SD - Kelas 6</p>
+                </div>
+            </div>
+            
+            <!-- Quick Info Header (Tampil saat ujian) -->
+            <div id="headerTimerBox" class="hidden flex items-center bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 rounded-full shadow-inner">
+                <i class="fa-regular fa-clock text-amber-400 mr-2 text-lg animate-pulse"></i>
+                <span id="timerDisplay" class="font-mono text-lg font-bold text-amber-400">90:00</span>
+            </div>
+
+            <div id="userInfoHeader" class="hidden text-right">
+                <p id="userNameHeader" class="font-bold text-sm leading-tight text-emerald-400"></p>
+                <p id="userClassHeader" class="text-xs text-slate-400"></p>
+            </div>
+
+            <div id="adminNavBtn" class="flex space-x-2">
+                <button onclick="switchRole('admin')" class="text-xs bg-slate-800 hover:bg-slate-700 text-amber-400 px-3.5 py-2 rounded-xl transition border border-amber-500/20 font-semibold flex items-center space-x-1.5 shadow-lg">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>Mode Guru</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- 1. LOGIN SCREEN -->
+        <section id="loginScreen" class="max-w-4xl mx-auto my-4 w-full">
+            
+            <!-- Banner Cabang Olahraga -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl overflow-hidden group hover:border-emerald-500/50 transition">
+                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=400&q=80" alt="Sepak Bola" class="h-24 w-full object-cover group-hover:scale-105 transition duration-300 opacity-80 group-hover:opacity-100">
+                    <div class="p-2 text-center bg-slate-900/90">
+                        <span class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-futbol"></i> Sepak Bola
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl overflow-hidden group hover:border-amber-500/50 transition">
+                    <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=400&q=80" alt="Bola Basket" class="h-24 w-full object-cover group-hover:scale-105 transition duration-300 opacity-80 group-hover:opacity-100">
+                    <div class="p-2 text-center bg-slate-900/90">
+                        <span class="text-xs font-bold text-amber-400 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-basketball"></i> Bola Basket
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl overflow-hidden group hover:border-cyan-500/50 transition">
+                    <img src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=400&q=80" alt="Bola Voli" class="h-24 w-full object-cover group-hover:scale-105 transition duration-300 opacity-80 group-hover:opacity-100">
+                    <div class="p-2 text-center bg-slate-900/90">
+                        <span class="text-xs font-bold text-cyan-400 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-volleyball"></i> Bola Voli
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl overflow-hidden group hover:border-blue-500/50 transition">
+                    <img src="https://images.unsplash.com/photo-1600965962361-9035dbfd1c50?auto=format&fit=crop&w=400&q=80" alt="Renang" class="h-24 w-full object-cover group-hover:scale-105 transition duration-300 opacity-80 group-hover:opacity-100">
+                    <div class="p-2 text-center bg-slate-900/90">
+                        <span class="text-xs font-bold text-blue-400 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-person-swimming"></i> Renang
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Form Card -->
+            <div class="bg-slate-800/90 p-6 md:p-8 rounded-3xl border border-slate-700/80 shadow-2xl backdrop-blur-xl">
+                <div class="text-center mb-6">
+                    <div class="inline-flex p-3 bg-amber-500/10 text-amber-400 rounded-2xl mb-2 border border-amber-500/20">
+                        <i class="fa-solid fa-medal text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-white uppercase tracking-wider">Masuk Ujian PJOK</h2>
+                    <p class="text-xs text-slate-400 mt-1">Pilih kelas dan nama Anda untuk memulai ujian arena</p>
+                </div>
+
+                <form id="loginForm" onsubmit="handleStudentLogin(event)" class="space-y-4 max-w-md mx-auto">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Pilih Kelas</label>
+                        <select id="selectClass" required onchange="populateStudentDropdown()" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition outline-none">
+                            <option value="">-- Pilih Kelas --</option>
+                            <option value="6 A">Kelas 6 A</option>
+                            <option value="6 B">Kelas 6 B</option>
+                            <option value="6 C">Kelas 6 C</option>
+                            <option value="6 D">Kelas 6 D</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Nama Siswa</label>
+                        <select id="selectName" required disabled class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition outline-none disabled:opacity-50">
+                            <option value="">-- Pilih Nama --</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-500/25 transition duration-200 flex items-center justify-center space-x-2 uppercase tracking-wide">
+                            <span>Mulai Ujian Now</span>
+                            <i class="fa-solid fa-bolt"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Quick Demo Button -->
+                <div class="mt-6 pt-6 border-t border-slate-700/60 text-center">
+                    <p class="text-xs text-slate-400 mb-2">Uji Coba Cepat (Demo):</p>
+                    <button onclick="quickTestLogin()" class="text-xs bg-slate-900 hover:bg-slate-950 text-slate-300 hover:text-white border border-slate-700 px-4 py-2 rounded-xl transition font-medium inline-flex items-center gap-2">
+                        <i class="fa-solid fa-play text-amber-400"></i> ABINA NUR ASSYFA - Kelas 6 A
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. INSTRUCTION SCREEN -->
+        <section id="instructionScreen" class="hidden max-w-3xl mx-auto my-4 bg-slate-800/90 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl backdrop-blur-xl">
+            <div class="border-b border-slate-700 pb-4 mb-6 flex justify-between items-center">
+                <div>
+                    <span class="bg-amber-500/10 text-amber-400 text-xs font-black px-3 py-1 rounded-full uppercase border border-amber-500/20">Arena Ready</span>
+                    <h2 class="text-2xl font-black text-white mt-2">Petunjuk & Aturan Ujian</h2>
+                </div>
+                <div class="text-right">
+                    <span id="instStudentName" class="font-bold text-emerald-400 block text-lg"></span>
+                    <span id="instStudentClass" class="text-xs bg-slate-900 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700"></span>
+                </div>
+            </div>
+
+            <div class="bg-amber-500/10 border border-amber-500/30 text-amber-200 p-4 rounded-2xl mb-6 text-sm flex items-start space-x-3">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xl mt-0.5"></i>
+                <div>
+                    <p class="font-bold text-amber-300">Peringatan Kesempatan Utama!</p>
+                    <p class="text-xs text-amber-200/90 mt-0.5">Siswa hanya memiliki <strong>1 kali kesempatan pengerjaan</strong>. Pastikan tidak keluar aplikasi sebelum menekan tombol Selesai & Kumpul.</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-slate-300 mb-8 bg-slate-900/80 p-5 rounded-2xl border border-slate-700/80 text-sm md:text-base">
+                <p class="font-bold text-white border-b border-slate-800 pb-2">Aturan Pengerjaan Soal:</p>
+                <ol class="list-decimal list-inside space-y-2.5 pl-2 text-slate-300 text-sm">
+                    <li>Berdoalah sebelum bertanding mengerjakan ujian PJOK ini.</li>
+                    <li>Ujian terdiri dari <strong>45 Soal Pilihan Ganda</strong> (Sepak Bola, Basket, Voli, & Renang).</li>
+                    <li>Pilih satu jawaban terbaik (A, B, C, atau D).</li>
+                    <li>Waktu bertanding total adalah <strong>90 Menit</strong>. Waktu habis = Otomatis Terkumpul.</li>
+                    <li>Gunakan panel nomor untuk navigasi cepat. <strong>Hijau = Sudah Dijawab</strong>, <strong>Merah = Belum Dijawab</strong>.</li>
+                </ol>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <button onclick="cancelInstruction()" class="text-slate-400 hover:text-white font-medium text-sm flex items-center space-x-1 transition">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Batal
+                </button>
+                <button onclick="startExam()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black px-8 py-3.5 rounded-xl shadow-lg shadow-emerald-500/25 transition transform hover:-translate-y-0.5 flex items-center space-x-2 uppercase">
+                    <span>Mulai Bertanding</span>
+                    <i class="fa-solid fa-play"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. EXAM SCREEN -->
+        <section id="examScreen" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                
+                <!-- Left/Main: Question Box -->
+                <div class="lg:col-span-3 space-y-4">
+                    <div class="bg-slate-800/90 p-6 md:p-8 rounded-3xl border border-slate-700/80 shadow-2xl backdrop-blur-xl min-h-[420px] flex flex-col justify-between">
+                        
+                        <!-- Question Header -->
+                        <div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700 pb-4 mb-5 gap-3">
+                                <!-- Sport Category Banner Badge -->
+                                <div id="categoryBadge" class="inline-flex items-center space-x-2 bg-slate-900 border border-slate-700 px-3.5 py-1.5 rounded-full">
+                                    <span id="categoryIcon" class="text-emerald-400 text-base"></span>
+                                    <span id="questionCategory" class="text-xs font-bold text-slate-200 uppercase tracking-wider">Kategori</span>
+                                </div>
+
+                                <span class="text-sm font-semibold text-slate-400">
+                                    Soal <span id="currentQuestionNum" class="text-amber-400 font-black text-xl">1</span> dari 45
+                                </span>
+                            </div>
+
+                            <!-- Sport Visual Banner inside Question -->
+                            <div class="mb-5 rounded-2xl overflow-hidden h-36 border border-slate-700 relative shadow-inner">
+                                <img id="questionSportImg" src="" alt="Olahraga" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+                                <div class="absolute bottom-3 left-4 flex items-center space-x-2">
+                                    <span id="questionSportTag" class="text-xs font-black uppercase px-2.5 py-1 rounded-md bg-emerald-500 text-slate-950">
+                                        SEPAK BOLA
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Question Text -->
+                            <div class="mb-6">
+                                <p id="questionText" class="text-base md:text-lg text-white font-medium leading-relaxed">
+                                    Loading soal...
+                                </p>
+                            </div>
+
+                            <!-- Options -->
+                            <div id="optionsContainer" class="space-y-3">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Question Nav Buttons -->
+                        <div class="flex justify-between items-center pt-6 mt-6 border-t border-slate-700/80">
+                            <button id="btnPrev" onclick="navigateQuestion(-1)" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-950 text-slate-300 font-semibold rounded-xl transition border border-slate-700 flex items-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                <span>Sebelumnya</span>
+                            </button>
+                            
+                            <button onclick="confirmSubmitExam()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow-lg shadow-rose-600/25 transition flex items-center space-x-2 uppercase text-xs">
+                                <i class="fa-solid fa-check-circle text-base"></i>
+                                <span>Selesai & Kumpul</span>
+                            </button>
+
+                            <button id="btnNext" onclick="navigateQuestion(1)" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                                <span>Berikutnya</span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right: Nav Matrix & Legend -->
+                <div class="lg:col-span-1 space-y-4">
+                    <div class="bg-slate-800/90 p-5 rounded-3xl border border-slate-700/80 shadow-2xl backdrop-blur-xl">
+                        <h3 class="font-bold text-white mb-3 text-sm flex items-center justify-between">
+                            <span><i class="fa-solid fa-border-all text-emerald-400 mr-1.5"></i> Navigasi Soal</span>
+                            <span id="answeredCounter" class="text-xs font-bold bg-slate-900 border border-slate-700 text-amber-400 px-2.5 py-1 rounded-full">0/45</span>
+                        </h3>
+
+                        <!-- Legend -->
+                        <div class="flex items-center space-x-4 mb-4 text-xs">
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-3.5 h-3.5 bg-emerald-500 rounded-sm inline-block"></span>
+                                <span class="text-slate-300">Sudah</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-3.5 h-3.5 bg-rose-500 rounded-sm inline-block"></span>
+                                <span class="text-slate-300">Belum</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-3.5 h-3.5 bg-amber-400 rounded-sm inline-block"></span>
+                                <span class="text-slate-300">Aktif</span>
+                            </div>
+                        </div>
+
+                        <!-- Matrix Grid -->
+                        <div id="questionMatrix" class="grid grid-cols-5 gap-2 max-h-[360px] overflow-y-auto custom-scroll pr-1">
+                            <!-- Matrix items generated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. RESULT SCREEN -->
+        <section id="resultScreen" class="hidden max-w-xl mx-auto my-6 bg-slate-800/90 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl backdrop-blur-xl text-center">
+            <div id="resultBadge" class="inline-block p-4 rounded-full mb-3 bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <i class="fa-solid fa-trophy text-5xl"></i>
+            </div>
+            
+            <h2 class="text-2xl font-black text-white uppercase tracking-wider mb-1">Ulangan Selesai!</h2>
+            <p class="text-slate-400 text-xs mb-6">Hasil perolehan nilai kamu telah berhasil dicatat oleh sistem.</p>
+
+            <div class="bg-slate-900/80 rounded-2xl p-5 border border-slate-700/80 mb-6 space-y-3">
+                <div class="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
+                    <span class="text-slate-400">Nama Siswa:</span>
+                    <span id="resStudentName" class="font-bold text-white"></span>
+                </div>
+                <div class="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
+                    <span class="text-slate-400">Kelas:</span>
+                    <span id="resStudentClass" class="font-semibold text-emerald-400"></span>
+                </div>
+                <div class="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
+                    <span class="text-slate-400">Jumlah Benar:</span>
+                    <span id="resCorrectCount" class="font-bold text-emerald-400">0 / 45</span>
+                </div>
+                <div class="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
+                    <span class="text-slate-400">Jumlah Salah / Kosong:</span>
+                    <span id="resWrongCount" class="font-bold text-rose-400">0 / 45</span>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-slate-200 font-bold">Nilai Akhir (Skala 100):</span>
+                    <span id="resFinalScore" class="text-4xl font-black text-amber-400">0</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-400 italic mb-6">*Kunci jawaban dan pembahasan ditutup sesuai dengan ketentuan ujian.</p>
+
+            <button onclick="logoutToMain()" class="w-full bg-slate-900 hover:bg-slate-950 text-white border border-slate-700 font-bold py-3.5 rounded-xl transition shadow-lg uppercase tracking-wider text-xs">
+                Kembali ke Halaman Utama
+            </button>
+        </section>
+
+        <!-- 5. ADMIN / GURU DASHBOARD -->
+        <section id="adminScreen" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-800/90 p-6 rounded-3xl border border-slate-700 shadow-xl backdrop-blur-xl">
+                <div>
+                    <span class="bg-amber-500/10 text-amber-400 text-xs font-bold px-3 py-1 rounded-full uppercase border border-amber-500/20">Panel Guru / Admin</span>
+                    <h2 class="text-2xl font-black text-white mt-1">Dashboard Rekapitulasi Nilai</h2>
+                    <p class="text-xs text-slate-400">Pantau dan unduh rekap nilai siswa secara otomatis</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="exportToExcel()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center space-x-2 uppercase">
+                        <i class="fa-solid fa-file-excel text-base"></i>
+                        <span>Download Excel Rekap</span>
+                    </button>
+                    <button onclick="resetAllData()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold px-4 py-2.5 rounded-xl border border-rose-500/30 transition flex items-center space-x-1">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Reset Data
+                    </button>
+                    <button onclick="switchRole('student')" class="bg-slate-900 hover:bg-slate-950 text-slate-300 border border-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl transition">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Ke Mode Siswa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Overview Card -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/80 shadow-md">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Siswa Terdaftar</div>
+                    <div id="statTotalStudents" class="text-3xl font-black text-white mt-1">0</div>
+                </div>
+                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/80 shadow-md">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Sudah Ulangan</div>
+                    <div id="statDoneStudents" class="text-3xl font-black text-emerald-400 mt-1">0</div>
+                </div>
+                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/80 shadow-md">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Belum Ulangan</div>
+                    <div id="statPendingStudents" class="text-3xl font-black text-amber-400 mt-1">0</div>
+                </div>
+                <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700/80 shadow-md">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Rata-rata Nilai</div>
+                    <div id="statAvgScore" class="text-3xl font-black text-cyan-400 mt-1">0</div>
+                </div>
+            </div>
+
+            <!-- Filter and Table -->
+            <div class="bg-slate-800/90 rounded-3xl shadow-xl border border-slate-700/80 overflow-hidden">
+                <div class="p-4 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold text-slate-300 uppercase">Filter Kelas:</span>
+                        <select id="adminFilterClass" onchange="renderAdminTable()" class="text-sm px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-white outline-none focus:ring-2 focus:ring-emerald-400">
+                            <option value="ALL">Semua Kelas</option>
+                            <option value="6 A">Kelas 6 A</option>
+                            <option value="6 B">Kelas 6 B</option>
+                            <option value="6 C">Kelas 6 C</option>
+                            <option value="6 D">Kelas 6 D</option>
+                        </select>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="adminSearch" onkeyup="renderAdminTable()" placeholder="Cari nama siswa..." class="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg bg-slate-900 border border-slate-700 text-white outline-none focus:ring-2 focus:ring-emerald-400 placeholder-slate-500">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-900/80 text-slate-300 border-b border-slate-700 font-bold uppercase text-xs">
+                                <th class="py-3 px-4">No</th>
+                                <th class="py-3 px-4">Nama Siswa</th>
+                                <th class="py-3 px-4">Kelas</th>
+                                <th class="py-3 px-4 text-center">Status</th>
+                                <th class="py-3 px-4 text-center">Benar</th>
+                                <th class="py-3 px-4 text-center">Salah/Kosong</th>
+                                <th class="py-3 px-4 text-center">Nilai (100)</th>
+                                <th class="py-3 px-4 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-slate-700/50 text-slate-300">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CUSTOM CONFIRMATION/ALERT MODAL -->
+    <div id="modalOverlay" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl transform transition-all">
+            <div id="modalIcon" class="text-4xl mb-3 text-center">
+                <i class="fa-solid fa-circle-question text-emerald-400"></i>
+            </div>
+            <h3 id="modalTitle" class="text-xl font-black text-white text-center mb-2">Konfirmasi</h3>
+            <p id="modalMessage" class="text-sm text-slate-300 text-center mb-6 leading-relaxed">Apakah Anda yakin?</p>
+            <div id="modalButtons" class="flex justify-center space-x-3">
+                <!-- Dynamic Buttons -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================
+           0. GAMBAR & TEMA OLAHRAGA
+           ========================================== */
+        const SPORT_THEMES = {
+            "Sepak Bola": {
+                img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1000&q=80",
+                icon: "fa-solid fa-futbol",
+                colorClass: "bg-emerald-500 text-slate-950"
+            },
+            "Bola Basket": {
+                img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1000&q=80",
+                icon: "fa-solid fa-basketball",
+                colorClass: "bg-amber-500 text-slate-950"
+            },
+            "Bola Voli": {
+                img: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=1000&q=80",
+                icon: "fa-solid fa-volleyball",
+                colorClass: "bg-cyan-500 text-slate-950"
+            },
+            "Renang": {
+                img: "https://images.unsplash.com/photo-1600965962361-9035dbfd1c50?auto=format&fit=crop&w=1000&q=80",
+                icon: "fa-solid fa-person-swimming",
+                colorClass: "bg-blue-500 text-white"
+            }
+        };
+
+        /* ==========================================
+           1. DATA SOAL (45 SOAL SESUAI PERMINTAAN)
+           ========================================== */
+        const QUESTIONS_DATA = [
+            // A. SEPAK BOLA (1-12)
+            { id: 1, category: "Sepak Bola", text: "Permainan sepak bola modern pertama kali berkembang dengan aturan tertulis di negara ....", options: ["Brasil", "Inggris", "Italia", "Jerman"], answer: 1 },
+            { id: 2, category: "Sepak Bola", text: "Organisasi sepak bola Indonesia, yaitu PSSI, didirikan oleh Ir. Soeratin Sosrosoegondo pada 19 April 1930 di kota ....", options: ["Jakarta", "Bandung", "Yogyakarta", "Surabaya"], answer: 2 },
+            { id: 3, category: "Sepak Bola", text: "Dalam latihan, Dodi ingin mengumpan bola kepada temannya yang berjarak dekat agar arah bola akurat dan mudah dikendalikan. Bagian kaki yang paling tepat digunakan adalah ....", options: ["kaki bagian dalam", "ujung sepatu", "tumit", "punggung kaki"], answer: 0 },
+            { id: 4, category: "Sepak Bola", text: "Andi menendang bola ke arah gawang dengan kuat, tetapi bola sering melambung terlalu tinggi di atas mistar. Perbaikan teknik yang paling tepat adalah ....", options: ["meletakkan kaki tumpu jauh di belakang bola", "memiringkan badan ke belakang saat menendang", "mengenai bagian bawah bola dengan ujung sepatu", "meletakkan kaki tumpu di samping bola, badan sedikit condong ke depan, dan mengenai tengah bola dengan punggung kaki"], answer: 3 },
+            { id: 5, category: "Sepak Bola", text: "Tujuan utama menggiring bola dengan sentuhan pendek berulang adalah agar ....", options: ["bola menjauh dari kaki supaya pemain bisa berlari cepat", "bola tetap dekat dan terkendali sehingga mudah menghindari lawan", "pemain dapat berlari tanpa melihat bola", "bola langsung masuk ke gawang"], answer: 1 },
+            { id: 6, category: "Sepak Bola", text: "Cara melakukan lemparan ke dalam (throw-in) yang benar adalah ....", options: ["dilempar dengan satu tangan dari samping badan", "dilempar dari bawah dengan kedua tangan", "dilempar dengan kedua tangan dari belakang kepala, kedua kaki tetap menyentuh tanah", "dilempar dari atas kepala sambil melompat"], answer: 2 },
+            { id: 7, category: "Sepak Bola", text: "Bola keluar melewati garis samping setelah terakhir disentuh oleh pemain Tim Merah. Keputusan wasit yang benar adalah ....", options: ["lemparan ke dalam untuk Tim Biru", "tendangan sudut untuk Tim Merah", "tendangan gawang untuk Tim Biru", "tendangan bebas langsung untuk Tim Biru"], answer: 0 },
+            { id: 8, category: "Sepak Bola", text: "Seorang bek sengaja mengumpan bola dengan kakinya kepada penjaga gawang timnya, lalu penjaga gawang menangkap bola itu dengan tangan di daerah penalti. Keputusan wasit yang tepat adalah ....", options: ["gol dinyatakan sah", "tendangan penalti untuk lawan", "lemparan ke dalam untuk lawan", "tendangan bebas tidak langsung untuk lawan"], answer: 3 },
+            { id: 9, category: "Sepak Bola", text: "Seorang pemain berada dalam posisi offside apabila saat bola diumpankan kepadanya, ia ....", options: ["berada di belakang bola dan di daerah timnya sendiri", "berada di luar garis samping lapangan", "lebih dekat ke garis gawang lawan daripada bola dan daripada pemain bertahan kedua terakhir lawan", "menerima bola dari tendangan sudut"], answer: 2 },
+            { id: 10, category: "Sepak Bola", text: "Seorang pemain menerima dua kartu kuning dalam satu pertandingan. Akibat yang terjadi adalah ....", options: ["pemain tersebut boleh terus bermain", "pemain dikeluarkan dari lapangan dan timnya bermain dengan kekurangan satu pemain", "pemain diganti pemain cadangan tanpa sanksi", "tim lawan mendapat hadiah satu gol"], answer: 1 },
+            { id: 11, category: "Sepak Bola", text: "Pertandingan sepak bola resmi untuk orang dewasa berlangsung selama .... dan setiap tim memainkan .... pemain di lapangan.", options: ["2 × 45 menit; 11", "4 × 15 menit; 11", "2 × 45 menit; 9", "2 × 30 menit; 7"], answer: 0 },
+            { id: 12, category: "Sepak Bola", text: "Wasit memberikan tendangan penalti kepada Tim Hijau karena bek lawan menjatuhkan penyerang di daerah penalti. Penendang akan menendang bola dari titik penalti yang berjarak .... dari garis gawang.", options: ["5 meter", "9 meter", "16 meter", "11 meter"], answer: 3 },
+
+            // B. BOLA BASKET (13-24)
+            { id: 13, category: "Bola Basket", text: "Permainan bola basket pertama kali diciptakan pada tahun 1891 oleh ....", options: ["William G. Morgan", "Pierre de Coubertin", "James Naismith", "Walter Camp"], answer: 2 },
+            { id: 14, category: "Bola Basket", text: "Mengapa permainan ini dinamakan bola basket?", options: ["Karena sasaran awalnya berupa keranjang (basket) buah persik yang digantung", "Karena bolanya dibuat dari anyaman bambu", "Karena permainan ini ditemukan oleh seorang petani keranjang", "Karena pemainnya harus membawa keranjang"], answer: 0 },
+            { id: 15, category: "Bola Basket", text: "Organisasi induk bola basket di Indonesia bernama ....", options: ["PBSI", "PERBASI", "PBVSI", "PSSI"], answer: 1 },
+            { id: 16, category: "Bola Basket", text: "Lawan menjaga Dimas dengan tangan terangkat tinggi di depannya, sedangkan temannya bebas di sebelah kiri. Agar bola bisa melewati penjagaan di bagian bawah dan sampai ke teman, jenis operan yang paling tepat adalah ....", options: ["operan di atas kepala dengan lemparan tinggi", "operan dada yang lurus setinggi dada", "lemparan satu tangan dari samping dengan sangat keras", "operan pantul (bounce pass)"], answer: 3 },
+            { id: 17, category: "Bola Basket", text: "Cara melakukan operan dada (chest pass) yang benar adalah ....", options: ["bola dipegang di depan dada dengan dua tangan, siku ditekuk, lalu lengan diluruskan dan pergelangan tangan dihentakkan ke depan", "bola diangkat di atas kepala lalu dilempar ke bawah ke arah lantai", "bola dipegang dengan satu tangan di samping badan lalu didorong", "bola diayun dari bawah lutut ke atas dengan satu tangan"], answer: 0 },
+            { id: 18, category: "Bola Basket", text: "Agar menggiring bola (dribbling) terkendali, bola harus didorong dengan ....", options: ["telapak tangan penuh dengan pukulan keras", "kepalan tangan", "ruas-ruas jari dan pergelangan tangan, bola dipantulkan sekitar setinggi pinggang", "pangkal telapak tangan sambil menunduk"], answer: 2 },
+            { id: 19, category: "Bola Basket", text: "Tembakan yang dilakukan setelah berlari dan mengambil dua langkah mendekati ring, lalu melompat dan menaruh bola ke ring, disebut ....", options: ["jump shot", "lay-up shoot", "lemparan bebas (free throw)", "set shot"], answer: 1 },
+            { id: 20, category: "Bola Basket", text: "Sinta menggiring bola, lalu berhenti dan memegang bola dengan kedua tangan. Setelah itu, ia menggiring bola lagi. Wasit meniup peluit karena Sinta melakukan pelanggaran ....", options: ["berjalan (traveling)", "tiga detik", "body charge", "dribel ganda (double dribble)"], answer: 3 },
+            { id: 21, category: "Bola Basket", text: "Rio menerima bola, kemudian berlari tiga langkah sambil membawa bola tanpa memantulkannya. Pelanggaran yang dilakukan Rio adalah ....", options: ["dribel ganda", "menahan lawan", "berjalan dengan bola (traveling)", "melempar bola ke luar lapangan"], answer: 2 },
+            { id: 22, category: "Bola Basket", text: "Dalam satu pertandingan, Tim Garuda mencetak 4 tembakan dari dalam garis tiga angka, 2 tembakan dari luar garis tiga angka, dan 3 lemparan bebas. Seluruh tembakan berhasil masuk. Total skor Tim Garuda adalah ....", options: ["17", "14", "19", "15"], answer: 0 },
+            { id: 23, category: "Bola Basket", text: "Ring bola basket dipasang pada ketinggian .... dari lantai.", options: ["2,43 meter", "3,05 meter", "2,24 meter", "3,50 meter"], answer: 1 },
+            { id: 24, category: "Bola Basket", text: "Menurut peraturan pertandingan resmi bola basket, pemain yang telah melakukan lima pelanggaran perorangan (personal foul) ....", options: ["diberi kartu merah dan pertandingan dihentikan", "wajib membayar denda kepada wasit", "tetap bermain, tetapi timnya mendapat hukuman", "harus keluar dari pertandingan dan digantikan pemain lain"], answer: 3 },
+
+            // C. BOLA VOLI (25-35)
+            { id: 25, category: "Bola Voli", text: "Pada servis bawah, bola dipukul dengan cara ....", options: ["memegang bola di depan badan, lalu memukulnya dengan kepalan atau telapak tangan yang diayun dari bawah ke depan", "melempar bola jauh ke belakang lalu memukulnya dari atas kepala", "mendorong bola dengan kedua tangan dari depan dada", "menendang bola dengan punggung kaki"], answer: 0 },
+            { id: 26, category: "Bola Voli", text: "Sikap tangan dan lengan yang benar saat melakukan passing bawah adalah ....", options: ["siku ditekuk dan kedua telapak tangan terbuka", "satu tangan ke depan dan satu tangan di belakang", "kedua lengan lurus dan rapat, bola dikenai pada lengan bagian bawah dekat pergelangan tangan", "jari-jari terbuka dan menghadap ke atas"], answer: 2 },
+            { id: 27, category: "Bola Voli", text: "Fungsi utama passing atas dalam permainan bola voli adalah ....", options: ["menyerang langsung ke daerah lawan dengan keras", "mengumpan bola kepada teman agar teman dapat melakukan smash", "memulai permainan dari garis belakang", "menahan bola agar tidak jatuh di bawah net"], answer: 1 },
+            { id: 28, category: "Bola Voli", text: "Urutan gerakan smash yang benar adalah ....", options: ["memukul bola, awalan, melompat, mendarat", "melompat, mendarat, awalan, memukul bola", "mendarat, awalan, memukul bola, melompat", "awalan, tolakan (melompat), memukul bola, mendarat"], answer: 3 },
+            { id: 29, category: "Bola Voli", text: "Tim Kuning menerima bola dari lawan. Bola disentuh oleh pemain pertama, kedua, ketiga, lalu pemain keempat sebelum diseberangkan ke daerah lawan. Keputusan wasit yang benar adalah ....", options: ["pelanggaran karena lebih dari tiga kali sentuhan, poin untuk lawan", "permainan dilanjutkan seperti biasa", "servis diulang", "pemain keempat dikeluarkan dari lapangan"], answer: 0 },
+            { id: 30, category: "Bola Voli", text: "Dalam bola voli modern, tim yang memenangkan satu reli (rally) selalu mendapat 1 poin, baik saat melakukan servis maupun saat menerima servis. Sistem penghitungan ini disebut ....", options: ["side-out", "poin tunggal", "rally point", "tie break"], answer: 2 },
+            { id: 31, category: "Bola Voli", text: "Tim Merah dan Tim Biru bermain pada set kedua dengan skor 24-24. Set dimenangkan oleh tim yang mencapai minimal 25 poin dengan selisih 2 poin. Skor akhir yang menunjukkan set telah selesai adalah ....", options: ["25-24", "26-25", "27-26", "26-24"], answer: 3 },
+            { id: 32, category: "Bola Voli", text: "Tim Elang berhasil merebut hak servis dari lawan setelah memenangkan reli. Yang harus dilakukan Tim Elang adalah ....", options: ["tidak ada perubahan posisi pemain", "berputar (rotasi) satu posisi searah jarum jam", "berputar satu posisi berlawanan arah jarum jam", "mengganti seluruh pemain dengan pemain cadangan"], answer: 1 },
+            { id: 33, category: "Bola Voli", text: "Pada pembelajaran bola voli mini di SD, tinggi net sengaja dibuat lebih rendah daripada net pertandingan dewasa. Alasan yang paling tepat adalah ....", options: ["agar disesuaikan dengan tinggi badan dan kemampuan anak sehingga teknik dasar lebih mudah dan aman dipelajari", "agar pemain tidak perlu melakukan blok", "agar permainan lebih cepat selesai", "karena aturan internasional mengharuskan hal itu"], answer: 0 },
+            { id: 34, category: "Bola Voli", text: "Lapangan bola voli berbentuk persegi panjang dengan ukuran ....", options: ["20 m × 10 m", "15 m × 8 m", "18 m × 9 m", "16 m × 8 m"], answer: 2 },
+            { id: 35, category: "Bola Voli", text: "Bola yang jatuh tepat mengenai garis batas lapangan dinyatakan ....", options: ["keluar (out)", "masuk (in)", "diulang kembali", "ditunda oleh wasit"], answer: 1 },
+
+            // D. RENANG (36-45)
+            { id: 36, category: "Renang", text: "Posisi tubuh yang benar agar luncuran di air bisa melaju jauh adalah ....", options: ["tubuh melengkung dan kepala mendongak", "lengan di samping badan dan lutut ditekuk", "kaki dan tangan terus digerakkan tanpa berhenti", "tubuh lurus, kedua lengan lurus ke depan di atas kepala, dan wajah berada di dalam air"], answer: 3 },
+            { id: 37, category: "Renang", text: "Posisi tubuh yang lurus dan ramping saat meluncur di air bertujuan untuk ....", options: ["mengurangi hambatan air sehingga luncuran lebih jauh", "memperbesar hambatan air agar tubuh stabil", "membuat tubuh tenggelam lebih cepat", "membuat tubuh lebih berat"], answer: 0 },
+            { id: 38, category: "Renang", text: "Perhatikan langkah-langkah meluncur dari tepi kolam berikut:\n(1) Tolakkan kaki kuat-kuat ke dinding kolam.\n(2) Tahan napas dan masukkan wajah ke dalam air.\n(3) Pegang tepi kolam menghadap dinding, kedua kaki dilipat menempel di dinding.\n(4) Luruskan tubuh dan lengan, lalu meluncur.\nUrutan yang benar adalah ....", options: ["(1), (2), (3), (4)", "(2), (3), (1), (4)", "(3), (2), (1), (4)", "(3), (1), (2), (4)"], answer: 2 },
+            { id: 39, category: "Renang", text: "Gerakan kaki pada renang gaya dada yang benar adalah ....", options: ["naik-turun bergantian dengan kaki lurus seperti gunting", "lutut ditekuk, telapak kaki dibuka ke luar, ditendangkan ke belakang-samping, lalu kedua kaki dirapatkan", "kedua kaki dirapatkan dan digerakkan seperti ekor lumba-lumba", "diayun melingkar bergantian seperti mengayuh sepeda"], answer: 1 },
+            { id: 40, category: "Renang", text: "Gerakan lengan pada renang gaya dada yang benar adalah ....", options: ["diayun bergantian di atas permukaan air", "ditarik lurus ke belakang sampai ke samping paha", "digerakkan naik-turun di samping badan", "dari lurus di depan, disapukan ke samping, ditarik ke depan dada, lalu diluruskan lagi ke depan"], answer: 3 },
+            { id: 41, category: "Renang", text: "Rini sering tersedak saat berenang gaya dada karena ia mengambil napas ketika kepalanya masih di dalam air. Perbaikan yang paling tepat adalah ....", options: ["mengangkat kepala untuk mengambil napas saat lengan ditarik ke depan dada, lalu mengembuskan napas lewat mulut atau hidung di dalam air saat meluncur", "menahan napas sampai tiba di tepi kolam", "mengambil napas ketika kaki menendang dengan kepala tetap di dalam air", "mengambil napas dan mengembuskannya sekaligus di atas air"], answer: 0 },
+            { id: 42, category: "Renang", text: "Koordinasi gerakan renang gaya dada yang benar adalah ....", options: ["lengan dan kaki bergerak bersamaan, napas diambil saat meluncur", "kaki menendang lebih dulu, lalu lengan menarik tanpa meluncur", "lengan menarik, mengambil napas, kaki menendang, lalu meluncur", "lengan menarik, meluncur, lalu kaki dan napas dilakukan sekaligus"], answer: 2 },
+            { id: 43, category: "Renang", text: "Budi berenang gaya dada, tetapi setelah menendang ia langsung mengulang gerakan lengan tanpa meluncur sehingga cepat lelah. Fungsi fase meluncur yang diabaikan Budi adalah ....", options: ["membuat tubuh tenggelam agar lebih stabil", "memanfaatkan dorongan tendangan kaki agar bergerak maju lebih jauh dan menghemat tenaga", "memperlambat gerakan agar tidak menabrak teman", "melatih menahan napas selama berenang"], answer: 1 },
+            { id: 44, category: "Renang", text: "Sari berenang gaya dada, tetapi lajunya lambat dan tubuhnya sering tenggelam. Guru mengamati lengan Sari menarik air sampai ke samping paha seperti gaya bebas. Perbaikan yang tepat adalah ....", options: ["menarik lengan lebih dalam sampai ke paha", "memakai gerakan kaki gaya bebas", "menahan napas selama berenang", "menarik lengan hanya sampai di depan dada, lalu meluruskannya kembali ke depan"], answer: 3 },
+            { id: 45, category: "Renang", text: "Ciri-ciri gerakan yang termasuk renang gaya dada adalah ....", options: ["posisi telungkup, lengan disapukan bersamaan, dan kaki menendang seperti katak", "posisi terlentang, lengan diayun bergantian ke belakang", "posisi telungkup, lengan bergantian, dan kaki naik-turun", "posisi miring, satu lengan menarik, dan kaki menggunting"], answer: 0 }
+        ];
+
+        /* ==========================================
+           2. DATA SISWA PER KELAS
+           ========================================== */
+        const STUDENTS_DATABASE = {
+            "6 A": [
+                "ABINA NUR ASSYFA", "ADYATSHA FAUSTA ORUDUGO ZEBUA", "AISAH FITRIAWATI", "ALBI ABID HAFIDZ FIRDAUS",
+                "BILAL FALAH RIZQULLAH", "CALISTA PUTRI SALSABILA", "CHALISA AMELIA", "FADLAN RAKA PRATAMA",
+                "FAHREZA DINAR MAULANA", "HANAYA NUR OKTAVIANI", "KAILA PUTRI SAGITA", "KHAYLA HAZIQAH NAUREEN",
+                "MAULIDA SYAFITRI", "MUHAMAD BANI KHAFID WAFI", "MUHAMAD IKHSAN", "MUHAMAD IKHSAN REVANDI",
+                "MUTIARA KURNIA PUTRI", "NAFIZ KURNIA PUTRA", "NAWAF SYIHABUDDIN YAFIQ", "NAZWA NUR HAFIDZAH",
+                "NIZAM AL SYAH RAWI", "RAHIMA ALIKA PUTRI", "RANGGA RADITYA PRATAMA", "RAZA TRI SYAHDIANDRA",
+                "SHINTA PERMANA PUTRI", "SYIFA ALIFIA KHOERUNISA", "TRIBUANA TUNGGADEWI ISHAK"
+            ],
+            "6 B": [
+                "AINIA THALITA ZAHRAN", "ALDIYANA PUTRA PRATAMA", "ALDO RIZKY NOVAL PRATAMA", "ALFIA KHOIRUNNISA",
+                "ALFISYAHR AHAD AL QODRI", "ALIFA KHUMAIRA", "ALINKA RIZKITA", "BILAL SYAHIDAN",
+                "CALLYSTA HUMAIRA PUTRI", "CINDY NATASYA", "FAISAL PUTRA PRAWIRA", "FAKHRI RANGGA SYAHPUTRA",
+                "HASNA NAILA ARKARNA", "HELDA VIOLASARI", "KALILA RIFDA", "MILNA FURI RAMADANI",
+                "MUHAMAD KHOERUNNASIR", "MUHMAD AL FAIZ RAIHAN KAMIL", "MUHAMMAD AZIZ JAFAR SIDIQ", "NADIA ANANDA PUTRI",
+                "NAFISAH QAIRINA ZAFIRAH", "NAUFAL HIKARU AFKAR HANDAYANA", "RAFFA HANAN BAGASDITY", "REVAL SEPTA ARAFA",
+                "RICCO RIZKI CHANIAGO", "SHINTIA PERMANA PUTRI", "SITI NUR AISAH JAMILAH", "SYAHWA ANDINI"
+            ],
+            "6 C": [
+                "ALISHA KHAIRA WILDA", "AQILA SYIFA AZ ZAHRA", "ARIF MAULANA", "ARKAN MUAFA KHAIRI",
+                "ARNETHA RESKIANA", "AZKA RAYYAN DIK KURNIA", "BILQIS NADHIFATUL AZHAR", "DESTI AULIA",
+                "FARIS HAMIZAN PRATAMA", "HARMONY FAKHIRA CANTIKA", "INAYYA AZMI SALSYABILLA", "KAYLA AZALIA SEPTIANI",
+                "MUHAMMAD FATHIR SALMANA", "MUHAMMAD GHOZALI", "MUHAMMAD HARIST MAQVI", "MUHAMMAD RAFFA RAHAYU",
+                "MUHAMMAD RAFFI RAHAYU", "NAURA ATHAYA AISHA", "PUSVITA", "RAFFI ARVIANSYAH SARIPUDIN",
+                "RIFKI ADITIA", "RIO SUNANDAR", "SILVI NUR AZKIA", "SIPA PITRIYANI",
+                "ZAHIRA DEWI ANGGRAENI", "HASNA", "RADLIN"
+            ],
+            "6 D": [
+                "ADILLA ALMAHIRA NAMERA", "ASHYLA SHAFITRI", "ASYIFA SALSABILA", "AUDREY CARISSA",
+                "AZ ZAHRA AZIA RAHMA", "AZKA PUTRA HERDIANSAH", "BISMA ARDANI", "DAFFA ALMAIR MAULANA",
+                "ERINA AMIRA RAHMADANI", "FAUZIA KHANZA RAMADHANI", "GABY AUDINA RIZQIANI", "GHISTIAN RAFLIANDRA ALFATIH",
+                "HASYBI MOCHAMMAD AL ARSYAD", "IKHSAN RIZKI PERMANA", "KENZA AZKHARA", "LUTHFI AQIL AL BUHORI",
+                "M DZAKIR HAFAZHI", "MUHAMMAD RAKAS PRATAMA", "MUHAMMAD SAKHA ARKAN", "NADIYA MAULIDA HUSNA",
+                "NAZMIA QUINITA AZZAHRA", "RIZKY AKBAR HARTANDI", "SALSABILA NUR AZIZAH", "SEPTIAN RAFKHA PRATAMA",
+                "SYAQILA GANTINA"
+            ]
+        };
+
+        /* ==========================================
+           3. APP STATE & LOCAL STORAGE
+           ========================================== */
+        let currentStudent = null;
+        let currentQuestionIdx = 0;
+        let studentAnswers = {};
+        let timerInterval = null;
+        let timeRemainingSeconds = 90 * 60;
+
+        const STORAGE_RECORDS = 'exam_pjok_records_v1';
+
+        function getExamRecords() {
+            const dataStr = localStorage.getItem(STORAGE_RECORDS);
+            return dataStr ? JSON.parse(dataStr) : [];
+        }
+
+        function saveExamRecord(record) {
+            const records = getExamRecords();
+            records.push(record);
+            localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+        }
+
+        /* ==========================================
+           4. LOGIN & INITIALIZATION LOGIC
+           ========================================== */
+        function populateStudentDropdown() {
+            const classSelect = document.getElementById('selectClass');
+            const nameSelect = document.getElementById('selectName');
+            const selectedClass = classSelect.value;
+
+            nameSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+
+            if (!selectedClass || !STUDENTS_DATABASE[selectedClass]) {
+                nameSelect.disabled = true;
+                return;
+            }
+
+            const studentList = STUDENTS_DATABASE[selectedClass];
+            studentList.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                nameSelect.appendChild(opt);
+            });
+
+            nameSelect.disabled = false;
+        }
+
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const selectedClass = document.getElementById('selectClass').value;
+            const selectedName = document.getElementById('selectName').value;
+
+            if (!selectedClass || !selectedName) {
+                showModal("Peringatan", "Silakan pilih Kelas dan Nama Siswa terlebih dahulu.", "info");
+                return;
+            }
+
+            const records = getExamRecords();
+            const existing = records.find(r => r.name === selectedName && r.className === selectedClass);
+
+            if (existing) {
+                showModal("Akses Ditolak", `Siswa <strong>${selectedName}</strong> (${selectedClass}) sudah pernah mengerjakan ulangan ini pada ${existing.date}. Kesempatan hanya 1 kali.`, "error");
+                return;
+            }
+
+            currentStudent = { name: selectedName, class: selectedClass };
+            
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('instructionScreen').classList.remove('hidden');
+
+            document.getElementById('instStudentName').textContent = currentStudent.name;
+            document.getElementById('instStudentClass').textContent = 'Kelas ' + currentStudent.class;
+        }
+
+        function quickTestLogin() {
+            document.getElementById('selectClass').value = "6 A";
+            populateStudentDropdown();
+            document.getElementById('selectName').value = "ABINA NUR ASSYFA";
+            
+            const event = new Event('submit');
+            handleStudentLogin(event);
+        }
+
+        function cancelInstruction() {
+            currentStudent = null;
+            document.getElementById('instructionScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        /* ==========================================
+           5. EXAM ENGINE & TIMER
+           ========================================== */
+        function startExam() {
+            document.getElementById('instructionScreen').classList.add('hidden');
+            document.getElementById('examScreen').classList.remove('hidden');
+            
+            document.getElementById('headerTimerBox').classList.remove('hidden');
+            document.getElementById('userInfoHeader').classList.remove('hidden');
+            document.getElementById('userNameHeader').textContent = currentStudent.name;
+            document.getElementById('userClassHeader').textContent = 'Kelas ' + currentStudent.class;
+
+            studentAnswers = {};
+            currentQuestionIdx = 0;
+            timeRemainingSeconds = 90 * 60;
+
+            renderQuestion();
+            renderMatrix();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timeRemainingSeconds--;
+                updateTimerDisplay();
+
+                if (timeRemainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    showModal("Waktu Habis!", "Waktu pengerjaan 90 menit telah selesai. Jawaban Anda otomatis dikirim.", "info", () => {
+                        finishExam();
+                    });
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemainingSeconds / 60);
+            const seconds = timeRemainingSeconds % 60;
+            const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = formatted;
+        }
+
+        function renderQuestion() {
+            const q = QUESTIONS_DATA[currentQuestionIdx];
+            const theme = SPORT_THEMES[q.category] || SPORT_THEMES["Sepak Bola"];
+
+            document.getElementById('questionCategory').textContent = q.category;
+            document.getElementById('categoryIcon').className = theme.icon;
+            document.getElementById('currentQuestionNum').textContent = currentQuestionIdx + 1;
+            document.getElementById('questionText').textContent = q.text;
+
+            // Visual Banner Olahraga Per Soal
+            const imgEl = document.getElementById('questionSportImg');
+            imgEl.src = theme.img;
+            imgEl.alt = q.category;
+            
+            const tagEl = document.getElementById('questionSportTag');
+            tagEl.textContent = q.category.toUpperCase();
+            tagEl.className = `text-xs font-black uppercase px-3 py-1 rounded-lg ${theme.colorClass}`;
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((optText, idx) => {
+                const isSelected = studentAnswers[q.id] === idx;
+                
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => selectOption(q.id, idx);
+                btn.className = `w-full text-left p-4 rounded-2xl border transition duration-200 cursor-pointer flex items-start space-x-3 ${
+                    isSelected 
+                        ? 'bg-slate-900 border-emerald-400 text-white ring-2 ring-emerald-400/50 shadow-lg' 
+                        : 'bg-slate-900/60 border-slate-700/80 hover:bg-slate-900 text-slate-200 hover:border-slate-600'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="w-7 h-7 flex-shrink-0 rounded-xl flex items-center justify-center font-black text-xs transition ${
+                        isSelected ? 'bg-emerald-400 text-slate-950 shadow' : 'bg-slate-800 text-slate-400 border border-slate-700'
+                    }">${optionLetters[idx]}</span>
+                    <span class="text-sm md:text-base leading-relaxed mt-0.5">${optText}</span>
+                `;
+                container.appendChild(btn);
+            });
+
+            document.getElementById('btnPrev').disabled = (currentQuestionIdx === 0);
+            document.getElementById('btnNext').disabled = (currentQuestionIdx === QUESTIONS_DATA.length - 1);
+
+            renderMatrix();
+        }
+
+        function selectOption(qId, optionIdx) {
+            studentAnswers[qId] = optionIdx;
+            renderQuestion();
+        }
+
+        function navigateQuestion(direction) {
+            const newIdx = currentQuestionIdx + direction;
+            if (newIdx >= 0 && newIdx < QUESTIONS_DATA.length) {
+                currentQuestionIdx = newIdx;
+                renderQuestion();
+            }
+        }
+
+        function jumpToQuestion(index) {
+            currentQuestionIdx = index;
+            renderQuestion();
+        }
+
+        function renderMatrix() {
+            const matrixContainer = document.getElementById('questionMatrix');
+            matrixContainer.innerHTML = '';
+
+            let answeredCount = 0;
+
+            QUESTIONS_DATA.forEach((q, idx) => {
+                const isAnswered = studentAnswers.hasOwnProperty(q.id);
+                if (isAnswered) answeredCount++;
+
+                const isActive = (idx === currentQuestionIdx);
+
+                const btn = document.createElement('button');
+                btn.onclick = () => jumpToQuestion(idx);
+                
+                let bgClass = "bg-rose-500/80 text-white hover:bg-rose-600 border border-rose-500"; 
+                if (isAnswered) {
+                    bgClass = "bg-emerald-500 text-slate-950 font-bold hover:bg-emerald-400 border border-emerald-400"; 
+                }
+                if (isActive) {
+                    bgClass = "bg-amber-400 text-slate-950 font-black ring-4 ring-amber-400/30 scale-105 z-10 border border-amber-300";
+                }
+
+                btn.className = `h-9 w-full rounded-xl text-xs font-bold flex items-center justify-center transition shadow ${bgClass}`;
+                btn.textContent = idx + 1;
+                matrixContainer.appendChild(btn);
+            });
+
+            document.getElementById('answeredCounter').textContent = `${answeredCount}/45`;
+        }
+
+        function confirmSubmitExam() {
+            const answeredCount = Object.keys(studentAnswers).length;
+            const totalCount = QUESTIONS_DATA.length;
+            const unAnswered = totalCount - answeredCount;
+
+            let message = "Apakah Anda yakin ingin menyelesaikan dan mengirim jawaban ujian?";
+            if (unAnswered > 0) {
+                message = `Masih ada <strong class="text-rose-400">${unAnswered} nomor soal yang BELUM dijawab</strong>. Yakin ingin mengumpulkan sekarang?`;
+            }
+
+            showModal("Konfirmasi Pengumpulan", message, "confirm", () => {
+                finishExam();
+            });
+        }
+
+        /* ==========================================
+           6. GRADING & RESULT SCORING
+           ========================================== */
+        function finishExam() {
+            clearInterval(timerInterval);
+
+            let correctCount = 0;
+            QUESTIONS_DATA.forEach(q => {
+                if (studentAnswers[q.id] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            const wrongCount = QUESTIONS_DATA.length - correctCount;
+            const finalScore = Math.round((correctCount / QUESTIONS_DATA.length) * 100);
+
+            const record = {
+                name: currentStudent.name,
+                className: currentStudent.class,
+                correct: correctCount,
+                wrong: wrongCount,
+                score: finalScore,
+                date: new Date().toLocaleString('id-ID')
+            };
+
+            saveExamRecord(record);
+
+            document.getElementById('examScreen').classList.add('hidden');
+            document.getElementById('headerTimerBox').classList.add('hidden');
+            document.getElementById('userInfoHeader').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            document.getElementById('resStudentName').textContent = currentStudent.name;
+            document.getElementById('resStudentClass').textContent = 'Kelas ' + currentStudent.class;
+            document.getElementById('resCorrectCount').textContent = `${correctCount} Soal`;
+            document.getElementById('resWrongCount').textContent = `${wrongCount} Soal`;
+            document.getElementById('resFinalScore').textContent = finalScore;
+        }
+
+        function logoutToMain() {
+            currentStudent = null;
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+            document.getElementById('selectName').disabled = true;
+        }
+
+        /* ==========================================
+           7. ADMIN / GURU DASHBOARD & EXCEL EXPORT
+           ========================================== */
+        function switchRole(role) {
+            if (role === 'admin') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('instructionScreen').classList.add('hidden');
+                document.getElementById('examScreen').classList.add('hidden');
+                document.getElementById('resultScreen').classList.add('hidden');
+                document.getElementById('headerTimerBox').classList.add('hidden');
+                document.getElementById('adminScreen').classList.remove('hidden');
+                renderAdminTable();
+            } else {
+                document.getElementById('adminScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        }
+
+        function getAllStudentsList() {
+            const list = [];
+            Object.keys(STUDENTS_DATABASE).forEach(cName => {
+                STUDENTS_DATABASE[cName].forEach(sName => {
+                    list.push({ name: sName, className: cName });
+                });
+            });
+            return list;
+        }
+
+        function renderAdminTable() {
+            const filterClass = document.getElementById('adminFilterClass').value;
+            const searchText = document.getElementById('adminSearch').value.toLowerCase();
+            const records = getExamRecords();
+            const allStudents = getAllStudentsList();
+
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+
+            let doneCount = 0;
+            let totalScoresSum = 0;
+
+            const recordMap = {};
+            records.forEach(r => {
+                recordMap[`${r.name}_${r.className}`] = r;
+            });
+
+            const filteredStudents = allStudents.filter(s => {
+                const matchClass = (filterClass === 'ALL' || s.className === filterClass);
+                const matchName = s.name.toLowerCase().includes(searchText);
+                return matchClass && matchName;
+            });
+
+            filteredStudents.forEach((student, index) => {
+                const recKey = `${student.name}_${student.className}`;
+                const rec = recordMap[recKey];
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/40 transition";
+
+                if (rec) {
+                    doneCount++;
+                    totalScoresSum += rec.score;
+
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-4 font-mono text-xs text-slate-500">${index + 1}</td>
+                        <td class="py-3.5 px-4 font-bold text-white">${student.name}</td>
+                        <td class="py-3.5 px-4"><span class="bg-slate-900 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-lg text-xs font-semibold">${student.className}</span></td>
+                        <td class="py-3.5 px-4 text-center"><span class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-check mr-1"></i>Selesai</span></td>
+                        <td class="py-3.5 px-4 text-center font-bold text-emerald-400">${rec.correct}</td>
+                        <td class="py-3.5 px-4 text-center font-bold text-rose-400">${rec.wrong}</td>
+                        <td class="py-3.5 px-4 text-center font-black text-amber-400 text-base">${rec.score}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <button onclick="deleteSingleRecord('${student.name}', '${student.className}')" title="Hapus / Izinkan Ujian Ulang" class="text-xs bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 p-1.5 rounded-lg transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-4 font-mono text-xs text-slate-500">${index + 1}</td>
+                        <td class="py-3.5 px-4 text-slate-400">${student.name}</td>
+                        <td class="py-3.5 px-4"><span class="bg-slate-900 text-slate-400 border border-slate-800 px-2 py-0.5 rounded text-xs">${student.className}</span></td>
+                        <td class="py-3.5 px-4 text-center"><span class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium px-2.5 py-1 rounded-full"><i class="fa-regular fa-clock mr-1"></i>Belum</span></td>
+                        <td class="py-3.5 px-4 text-center text-slate-600">-</td>
+                        <td class="py-3.5 px-4 text-center text-slate-600">-</td>
+                        <td class="py-3.5 px-4 text-center text-slate-600 font-bold">-</td>
+                        <td class="py-3.5 px-4 text-center text-slate-600">-</td>
+                    `;
+                }
+
+                tbody.appendChild(tr);
+            });
+
+            const totalStudents = allStudents.length;
+            document.getElementById('statTotalStudents').textContent = totalStudents;
+            document.getElementById('statDoneStudents').textContent = doneCount;
+            document.getElementById('statPendingStudents').textContent = totalStudents - doneCount;
+            const avg = doneCount > 0 ? (totalScoresSum / doneCount).toFixed(1) : 0;
+            document.getElementById('statAvgScore').textContent = avg;
+        }
+
+        function deleteSingleRecord(name, className) {
+            showModal("Reset Ujian Siswa", `Hapus hasil ulangan <strong>${name}</strong> (${className})? Siswa akan diizinkan login dan mengerjakan ulang.`, "confirm", () => {
+                let records = getExamRecords();
+                records = records.filter(r => !(r.name === name && r.className === className));
+                localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+                renderAdminTable();
+            });
+        }
+
+        function resetAllData() {
+            showModal("Reset Semua Data", "Apakah Anda yakin ingin menghapus <strong>SELURUH REKAPITULASI NILAI</strong> siswa? Data yang dihapus tidak dapat dikembalikan.", "confirm", () => {
+                localStorage.removeItem(STORAGE_RECORDS);
+                renderAdminTable();
+            });
+        }
+
+        function exportToExcel() {
+            const records = getExamRecords();
+            const allStudents = getAllStudentsList();
+
+            if (records.length === 0) {
+                showModal("Informasi Export", "Belum ada siswa yang menyelesaikan ulangan. Data masih kosong.", "info");
+                return;
+            }
+
+            const recordMap = {};
+            records.forEach(r => {
+                recordMap[`${r.name}_${r.className}`] = r;
+            });
+
+            const exportData = allStudents.map((s, idx) => {
+                const rec = recordMap[`${s.name}_${s.className}`];
+                return {
+                    "No": idx + 1,
+                    "Nama Siswa": s.name,
+                    "Kelas": s.className,
+                    "Status": rec ? "Selesai" : "Belum Mengerjakan",
+                    "Jumlah Benar": rec ? rec.correct : 0,
+                    "Jumlah Salah/Kosong": rec ? rec.wrong : 0,
+                    "Nilai Akhir (100)": rec ? rec.score : 0,
+                    "Waktu Selesai": rec ? rec.date : "-"
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Nilai PJOK");
+
+            const max_width = exportData.reduce((w, r) => Math.max(w, r["Nama Siswa"].length), 10);
+            worksheet["!cols"] = [
+                { wch: 5 },
+                { wch: max_width + 5 },
+                { wch: 10 },
+                { wch: 18 },
+                { wch: 15 },
+                { wch: 20 },
+                { wch: 18 },
+                { wch: 22 }
+            ];
+
+            XLSX.writeFile(workbook, `Rekap_Nilai_PJOK_SD_Kelas6_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        /* ==========================================
+           8. MODAL DIALOG HELPER
+           ========================================== */
+        function showModal(title, message, type = "info", onConfirm = null) {
+            const overlay = document.getElementById('modalOverlay');
+            const icon = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const msgEl = document.getElementById('modalMessage');
+            const btnContainer = document.getElementById('modalButtons');
+
+            titleEl.textContent = title;
+            msgEl.innerHTML = message;
+
+            if (type === 'error') {
+                icon.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-500"></i>`;
+            } else if (type === 'confirm') {
+                icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>`;
+            } else {
+                icon.innerHTML = `<i class="fa-solid fa-circle-info text-cyan-400"></i>`;
+            }
+
+            btnContainer.innerHTML = '';
+
+            if (type === 'confirm') {
+                const btnCancel = document.createElement('button');
+                btnCancel.className = "px-4 py-2 bg-slate-900 hover:bg-slate-950 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 transition";
+                btnCancel.textContent = "Batal";
+                btnCancel.onclick = () => overlay.classList.add('hidden');
+
+                const btnOk = document.createElement('button');
+                btnOk.className = "px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black shadow transition uppercase";
+                btnOk.textContent = "Ya, Lanjutkan";
+                btnOk.onclick = () => {
+                    overlay.classList.add('hidden');
+                    if (onConfirm) onConfirm();
+                };
+
+                btnContainer.appendChild(btnCancel);
+                btnContainer.appendChild(btnOk);
+            } else {
+                const btnClose = document.createElement('button');
+                btnClose.className = "px-5 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl text-xs font-black transition uppercase";
+                btnClose.textContent = "Mengerti";
+                btnClose.onclick = () => {
+                    overlay.classList.add('hidden');
+                    if (onConfirm) onConfirm();
+                };
+                btnContainer.appendChild(btnClose);
+            }
+
+            overlay.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
